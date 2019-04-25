@@ -17,6 +17,7 @@ class MainVIewModel: ViewModel(), CoroutineScope {
             delay(1000L)
             println("Print something after launch")
         }
+
     }
 
 
@@ -25,6 +26,7 @@ class MainVIewModel: ViewModel(), CoroutineScope {
         launch(Dispatchers.Main) {// new coroutine runs on Android UI thread
             val result1: Int = withContext(Dispatchers.Default) {// new child context/
                 // do something and that will happen in background thread
+                //nbdsjdh
                 return@withContext 20
             }
 
@@ -32,6 +34,7 @@ class MainVIewModel: ViewModel(), CoroutineScope {
 
             val result2Deferred: Deferred<String> = async(Dispatchers.Default) {// new child context
 // do something and that will happen in background thread
+                delay(2000L)
                 return@async "Result2"
             }
 
@@ -40,18 +43,22 @@ class MainVIewModel: ViewModel(), CoroutineScope {
             val result2: String = result2Deferred.await()
 
             println("result 2 is '$result2")
+            println("result 3 is 'Tets")
         }
     }
 
     // Running coroutine sequentially
      fun seq() {
         launch {
-            val result1: Int = withContext(Dispatchers.Default) {
-                return@withContext 1
+            val result1: Deferred<Int> = async(Dispatchers.Default) {
+                println("Started first async")
+                delay(4000L)
+                println("Delayed fnished  async")
+                return@async 1
             }
 
             val result2: Int = withContext(Dispatchers.Default) {
-                println("Result 1 can be used here '$result1")
+                println("Result 1 can be used here '${result1.await()}")
                 return@withContext 2
             }
             println("result 2 is '$result2")
@@ -63,13 +70,16 @@ class MainVIewModel: ViewModel(), CoroutineScope {
         launch {
             val result1Deferred: Deferred<Int> = async(Dispatchers.Default) {
                 // do something
+                delay(4000L)
                 println("Get result 1 from background")
                 return@async 1
             }
 
             val result2Deferred: Deferred<Int> = async(Dispatchers.Default) {
                 // do something
+                delay(1000L)
                 println("Get result 2 from background")
+
                 return@async 2
             }
 
@@ -82,4 +92,8 @@ class MainVIewModel: ViewModel(), CoroutineScope {
         }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        job.cancel()
+    }
 }
