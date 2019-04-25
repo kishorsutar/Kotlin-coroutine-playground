@@ -12,14 +12,16 @@ class MainVIewModel: ViewModel(), CoroutineScope {
         get() = Dispatchers.Main + job
 
     fun callSomething() {
+        println("Print something before launch")
         val job = launch(coroutineContext) {// main coroutine scope
             delay(1000L)
+            println("Print something after launch")
         }
     }
 
 
     // Using different types of coroutine
-    private fun coroutineExample() {
+     fun coroutineExample() {
         launch(Dispatchers.Main) {// new coroutine runs on Android UI thread
             val result1: Int = withContext(Dispatchers.Default) {// new child context/
                 // do something and that will happen in background thread
@@ -42,7 +44,7 @@ class MainVIewModel: ViewModel(), CoroutineScope {
     }
 
     // Running coroutine sequentially
-    private fun seq() {
+     fun seq() {
         launch {
             val result1: Int = withContext(Dispatchers.Default) {
                 return@withContext 1
@@ -52,25 +54,31 @@ class MainVIewModel: ViewModel(), CoroutineScope {
                 println("Result 1 can be used here '$result1")
                 return@withContext 2
             }
-
+            println("result 2 is '$result2")
         }
     }
 
     // running in parallel
-    private fun par() {
+     fun par() {
         launch {
             val result1Deferred: Deferred<Int> = async(Dispatchers.Default) {
                 // do something
+                println("Get result 1 from background")
                 return@async 1
             }
 
             val result2Deferred: Deferred<Int> = async(Dispatchers.Default) {
                 // do something
+                println("Get result 2 from background")
                 return@async 2
             }
 
             val result1: Int = result1Deferred.await()
             val result2: Int = result2Deferred.await()
+
+            println("Fetched result 1 $result1")
+            println("Fetched result 2 $result2")
+
         }
     }
 
